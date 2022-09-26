@@ -10,7 +10,7 @@ export default function Random() {
   }
 
   if (!recommendation) {
-    return <div>Loading...</div>;
+    return <div data-cy="LoadingRandom">Loading...</div>;
   }
 
   return (

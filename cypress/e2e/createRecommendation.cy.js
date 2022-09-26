@@ -16,6 +16,23 @@ describe("createRecommendation", () => {
     cy.wait("@getLike");
     cy.contains(`${Name}`).should("be.visible");
   });
+  it("try to create same recommendation", () => {
+    const Name = faker.lorem.word();
+    const link = faker.lorem.word();
+    cy.visit("http://localhost:3000");
+    cy.intercept("GET", "/recommendations").as("getLike");
+    cy.get("input[data-cy=NameInput]").type(Name);
+    cy.get("input[data-cy=LinkInput]").type(`https://www.youtube.com/${link}`);
+    cy.get("button[data-cy=CreateButton]").click();
+    cy.wait("@getLike");
+    cy.get("input[data-cy=NameInput]").type(Name);
+    cy.get("input[data-cy=LinkInput]").type(`https://www.youtube.com/${link}`);
+    cy.get("button[data-cy=CreateButton]").click();
+    cy.on("window:alert", (t) => {
+      expect(t).to.contains("Error creating recommendation!");
+    });
+  });
+
   it("likes a recommendation", () => {
     cy.visit("http://localhost:3000");
     const Name = faker.lorem.word();
@@ -63,5 +80,12 @@ describe("createRecommendation", () => {
     cy.get("div[data-cy=LikeContainer]").first().should("have.text", -5);
     cy.contains("name").should("not.exist");
   });
+  it("user do not type valid inputs", () => {
+    cy.visit("http://localhost:3000");
+    cy.intercept("GET", "/recommendations").as("getLike");
+    cy.get("button[data-cy=CreateButton]").click();
+    cy.on("window:alert", (t) => {
+      expect(t).to.contains("Error creating recommendation!");
+    });
+  });
 });
-
